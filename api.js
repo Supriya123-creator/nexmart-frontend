@@ -6,7 +6,7 @@
 // ── Change this to your Render URL after deploying backend ──
 // const BASE_URL = 'https://nexmart-backend-khy5.onrender.com';
 // PRODUCTION → 'https://nexmart-backend.onrender.com'  ← replace with your actual render URL
-const BASE_URL = 'https://nexmart-backend.onrender.com';
+const BASE_URL = 'https://nexmart-backend-khy5.onrender.com';
 
 /* ── Token helpers (JWT stored in localStorage) ────────────── */
 function getToken()   { return localStorage.getItem('nexmart_token'); }
