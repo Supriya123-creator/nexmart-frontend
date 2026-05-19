@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEXMART — Product Catalog</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════
+       NAVIGATION
+       ═══════════════════════════ -->
+  <nav>
+    <div class="logo">NEX<span>MART</span></div>
+    <div class="nav-right">
+      <!-- Task 7: Auth button -->
+      <button class="auth-nav-btn" id="auth-nav-btn" onclick="handleAuthNavClick()">
+        🔐 Login
+      </button>
+      <!-- Task 7: Admin only shown when logged in -->
+      <button class="admin-toggle-btn" id="admin-nav-btn" onclick="toggleAdminPanel()" title="Admin Panel" style="display:none">
+        ⚙️ Admin
+      </button>
+      <button id="cart-btn" onclick="toggleCart()">
+        🛒 Cart
+        <span id="cart-count">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════
+       HERO SECTION
+       ═══════════════════════════ -->
+  <section class="hero">
+    <div class="hero-tag">✦ New Collection 2025</div>
+    <h1>Discover <span class="grad">Premium</span><br>Products</h1>
+    <p>Shop the latest in Electronics, Fashion, Grocery &amp; Home</p>
+    <div class="task6-badge">⚡ Task 7 — Full Stack Edition</div>
+  </section>
+
+  <!-- ═══════════════════════════
+       TASK 7: AUTH MODAL
+       ═══════════════════════════ -->
+  <div class="modal-backdrop" id="auth-backdrop" onclick="handleAuthBackdropClick(event)" role="dialog" aria-modal="true" style="display:none">
+    <div class="auth-modal" id="auth-modal">
+      <button class="modal-close" onclick="closeAuthModal()" aria-label="Close">✕</button>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login"    onclick="switchAuthTab('login')">Login</button>
+        <button class="auth-tab"        id="tab-register" onclick="switchAuthTab('register')">Register</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="auth-login-form">
+        <h2 class="auth-title">Welcome Back</h2>
+        <p class="auth-sub">Sign in to manage products</p>
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="you@example.com" />
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" />
+        </div>
+        <div class="auth-error" id="login-error"></div>
+        <button class="auth-submit-btn" onclick="handleLogin()">
+          <span id="login-btn-text">Login →</span>
+        </button>
+        <p class="auth-switch">No account? <a onclick="switchAuthTab('register')">Register here</a></p>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="auth-register-form" style="display:none">
+        <h2 class="auth-title">Create Account</h2>
+        <p class="auth-sub">Join NEXMART to add &amp; manage products</p>
+        <div class="auth-field">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="Your Name" />
+        </div>
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="you@example.com" />
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="reg-password" placeholder="Min. 6 characters" />
+        </div>
+        <div class="auth-error" id="reg-error"></div>
+        <button class="auth-submit-btn" onclick="handleRegister()">
+          <span id="reg-btn-text">Create Account →</span>
+        </button>
+        <p class="auth-switch">Already have an account? <a onclick="switchAuthTab('login')">Login here</a></p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════
+       TASK 7: ADMIN PANEL
+       ═══════════════════════════ -->
+  <div class="admin-panel" id="admin-panel">
+    <div class="admin-inner">
+      <div class="admin-header">
+        <div>
+          <div class="admin-label">⚙️ Admin Panel</div>
+          <div class="admin-sub">Add products to your own MongoDB database</div>
+        </div>
+        <button class="admin-close-btn" onclick="toggleAdminPanel()">✕</button>
+      </div>
+      <div class="admin-form-row">
+        <div class="admin-field">
+          <label>Product Title</label>
+          <input type="text" id="admin-title" placeholder="e.g. Wireless Speaker Pro" />
+        </div>
+        <div class="admin-field">
+          <label>Price (₹)</label>
+          <input type="number" id="admin-price" placeholder="e.g. 2999" min="1" />
+        </div>
+        <div class="admin-field">
+          <label>Category</label>
+          <select id="admin-category">
+            <option value="Electronics">Electronics</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Grocery">Grocery</option>
+            <option value="Home">Home</option>
+          </select>
+        </div>
+        <div class="admin-field">
+          <label>Image URL (optional)</label>
+          <input type="text" id="admin-image" placeholder="https://..." />
+        </div>
+        <div class="admin-field">
+          <label>Description (optional)</label>
+          <input type="text" id="admin-desc" placeholder="Short product description..." />
+        </div>
+        <button class="admin-add-btn" onclick="handleAddProduct()">
+          <span id="admin-btn-text">＋ Add Product</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════
+       SPINNER
+       ═══════════════════════════ -->
+  <div id="spinner" class="spinner-wrap" style="display:none">
+    <div class="spinner-ring"></div>
+    <p>Loading products from your database…</p>
+  </div>
+
+  <!-- ═══════════════════════════
+       ERROR STATE
+       ═══════════════════════════ -->
+  <div id="error-msg" class="error-banner" style="display:none">
+    <span class="error-icon">⚠️</span>
+    <div>
+      <strong>Could not load products</strong>
+      <p id="error-detail">Check your API connection.</p>
+    </div>
+    <button class="retry-btn" onclick="retryLoad()">↺ Retry</button>
+  </div>
+
+  <!-- ═══════════════════════════
+       CONTROLS — Search, Filter, Sort
+       ═══════════════════════════ -->
+  <div class="controls" id="controls-bar" style="display:none">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search products…" oninput="applyFilters()" aria-label="Search products">
+    </div>
+    <select class="ctrl-select" id="sort-select" onchange="applyFilters()" aria-label="Sort products">
+      <option value="default">Sort: Default</option>
+      <option value="price-asc">Price: Low → High</option>
+      <option value="price-desc">Price: High → Low</option>
+      <option value="name-asc">Name: A → Z</option>
+      <option value="name-desc">Name: Z → A</option>
+      <option value="rating">Top Rated</option>
+    </select>
+    <div class="price-range-wrap">
+      <span>Price</span>
+      <input type="range" id="price-range" min="100" max="999999" value="999999" oninput="updatePriceLabel()" aria-label="Max price filter">
+      <span id="price-label">≤ ₹9,99,999</span>
+    </div>
+    <div class="cat-pills" id="cat-pills"></div>
+  </div>
+
+  <!-- RESULTS BAR -->
+  <div class="results-bar" id="results-bar" style="display:none">
+    <div id="results-info">Loading products…</div>
+    <div id="view-info" style="color:var(--text-dim);font-size:12px;"></div>
+  </div>
+
+  <!-- PRODUCT GRID -->
+  <main class="grid-wrap">
+    <div id="product-grid"></div>
+  </main>
+
+  <!-- PAGINATION -->
+  <div id="pagination" role="navigation" aria-label="Product pages"></div>
+
+  <!-- ═══════════════════════════
+       FOOTER
+       ═══════════════════════════ -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">NEX<span>MART</span></div>
+      <p>© 2025 NEXMART Technology &nbsp;·&nbsp; Built for Maincrafts Full Stack Internship &nbsp;·&nbsp; Task 7 — Full Stack Edition</p>
+      <div class="footer-links">
+        <span>🌐 Own REST API</span>
+        <span>🍃 MongoDB Atlas</span>
+        <span>🔐 JWT Auth</span>
+        <span>🚀 Render Deployed</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- PRODUCT DETAIL MODAL -->
+  <div class="modal-backdrop" id="modal-backdrop" onclick="handleModalClick(event)" role="dialog" aria-modal="true">
+    <div class="modal" id="modal">
+      <div class="modal-img">
+        <img id="modal-img" src="" alt="Product image">
+      </div>
+      <div class="modal-info">
+        <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+        <div class="modal-cat"   id="modal-cat"></div>
+        <div class="modal-title" id="modal-title"></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="stars" id="modal-stars"></div>
+          <span style="font-size:12px;color:var(--text-muted)" id="modal-reviews"></span>
+        </div>
+        <div class="modal-price" id="modal-price"></div>
+        <div class="modal-desc"  id="modal-desc"></div>
+        <div class="qty-row">
+          <button class="qty-btn" onclick="changeQty(-1)" aria-label="Decrease quantity">−</button>
+          <div class="qty-val" id="modal-qty">1</div>
+          <button class="qty-btn" onclick="changeQty(1)"  aria-label="Increase quantity">+</button>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="modal-add-btn"    id="modal-add-btn"    onclick="addModalToCart()"       style="flex:1">Add to Cart 🛒</button>
+          <button class="modal-delete-btn" id="modal-delete-btn" onclick="handleDeleteFromModal()" style="display:none">🗑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CART DRAWER -->
+  <div class="cart-backdrop" id="cart-backdrop" onclick="handleCartClick(event)" role="dialog" aria-modal="true" aria-label="Shopping cart">
+    <div class="cart-drawer">
+      <div class="cart-header">
+        <h2>🛒 Your Cart</h2>
+        <button class="cart-close" onclick="toggleCart()" aria-label="Close cart">✕</button>
+      </div>
+      <div id="cart-items"></div>
+      <div class="cart-footer">
+        <div class="cart-summary" id="cart-summary"></div>
+        <button class="checkout-btn" onclick="checkout()">Checkout ✦</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- SCRIPTS -->
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
