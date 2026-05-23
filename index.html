@@ -20,11 +20,9 @@
   <nav>
     <div class="logo">NEX<span>MART</span></div>
     <div class="nav-right">
-      <!-- Task 7: Auth button -->
       <button class="auth-nav-btn" id="auth-nav-btn" onclick="handleAuthNavClick()">
         🔐 Login
       </button>
-      <!-- Task 7: Admin only shown when logged in -->
       <button class="admin-toggle-btn" id="admin-nav-btn" onclick="toggleAdminPanel()" title="Admin Panel" style="display:none">
         ⚙️ Admin
       </button>
@@ -41,12 +39,12 @@
   <section class="hero">
     <div class="hero-tag">✦ New Collection 2025</div>
     <h1>Discover <span class="grad">Premium</span><br>Products</h1>
-    <p>Shop the latest in Electronics, Fashion, Grocery &amp; Home</p>
+    <p>Shop the latest in Electronics, Fashion, Books &amp; More</p>
     <div class="task6-badge">⚡ Task 7 — Full Stack Edition</div>
   </section>
 
   <!-- ═══════════════════════════
-       TASK 7: AUTH MODAL
+       AUTH MODAL
        ═══════════════════════════ -->
   <div class="modal-backdrop" id="auth-backdrop" onclick="handleAuthBackdropClick(event)" role="dialog" aria-modal="true" style="display:none">
     <div class="auth-modal" id="auth-modal">
@@ -103,7 +101,7 @@
   </div>
 
   <!-- ═══════════════════════════
-       TASK 7: ADMIN PANEL
+       ADMIN PANEL
        ═══════════════════════════ -->
   <div class="admin-panel" id="admin-panel">
     <div class="admin-inner">
@@ -125,11 +123,13 @@
         </div>
         <div class="admin-field">
           <label>Category</label>
+          <!-- ✅ FIXED: Added Books and Sports, removed Grocery -->
           <select id="admin-category">
             <option value="Electronics">Electronics</option>
             <option value="Fashion">Fashion</option>
-            <option value="Grocery">Grocery</option>
             <option value="Home">Home</option>
+            <option value="Books">Books</option>
+            <option value="Sports">Sports</option>
           </select>
         </div>
         <div class="admin-field">
