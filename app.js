@@ -1,5 +1,7 @@
 /* ============================================================
    NEXMART — app.js  (Task 7 — Full Stack Edition)
+   Auth-aware UI: login/register, protected admin,
+   JWT-gated add/delete.
    ============================================================ */
 
 /* ════════════════════════════
@@ -217,7 +219,7 @@ async function handleAddProduct() {
     applyFilters();
     showToast(`✅ "${name}" added successfully!`, 'success');
 
-    ['admin-title','admin-price','admin-image','admin-desc'].forEach(id =>
+    ['admin-title', 'admin-price', 'admin-image', 'admin-desc'].forEach(id =>
       (document.getElementById(id).value = '')
     );
   } catch (err) {
@@ -238,18 +240,18 @@ function applyFilters() {
   const cats     = [...pills].map(p => p.dataset.cat);
 
   let result = PRODUCTS.filter(p => {
-    const inSearch = (p.title||'').toLowerCase().includes(query) || (p.desc||'').toLowerCase().includes(query);
+    const inSearch = (p.title || '').toLowerCase().includes(query) || (p.desc || '').toLowerCase().includes(query);
     const inCat    = cats.length === 0 || cats.includes(p.category);
     const inPrice  = p.price <= maxPrice;
     return inSearch && inCat && inPrice;
   });
 
   const sortFns = {
-    'price-asc'  : (a,b) => a.price - b.price,
-    'price-desc' : (a,b) => b.price - a.price,
-    'name-asc'   : (a,b) => (a.title||'').localeCompare(b.title||''),
-    'name-desc'  : (a,b) => (b.title||'').localeCompare(a.title||''),
-    'rating'     : (a,b) => (b.rating||0) - (a.rating||0),
+    'price-asc'  : (a, b) => a.price - b.price,
+    'price-desc' : (a, b) => b.price - a.price,
+    'name-asc'   : (a, b) => (a.title || '').localeCompare(b.title || ''),
+    'name-desc'  : (a, b) => (b.title || '').localeCompare(a.title || ''),
+    'rating'     : (a, b) => (b.rating || 0) - (a.rating || 0),
   };
   if (sortFns[sort]) result.sort(sortFns[sort]);
 
@@ -379,7 +381,8 @@ function handleModalClick(e) {
 }
 
 function changeQty(delta) {
-  modalQty = Math.max(1, modalQty + delta);
+  // Capped between 1 and 10
+  modalQty = Math.max(1, Math.min(10, modalQty + delta));
   document.getElementById('modal-qty').textContent = modalQty;
 }
 
@@ -404,8 +407,13 @@ function addToCartById(id) {
   const p = PRODUCTS.find(x => String(x.id || x._id) === String(id));
   if (!p) return;
   const item = CART.find(c => c.id === String(id));
-  if (item) item.qty++;
-  else CART.push({ id: String(id), title: p.title, price: p.price, image: p.image, qty: 1 });
+  if (item) {
+    // Respect max qty limit when quick-adding too
+    const MAX_QTY = 10;
+    if (item.qty < MAX_QTY) item.qty++;
+  } else {
+    CART.push({ id: String(id), title: p.title, price: p.price, image: p.image, qty: 1 });
+  }
   saveCart();
 }
 
@@ -434,11 +442,13 @@ function handleCartClick(e) {
 function renderCartItems() {
   const el      = document.getElementById('cart-items');
   const summary = document.getElementById('cart-summary');
+
   if (!CART.length) {
     el.innerHTML = `<div class="cart-empty"><p>Your cart is empty 🛒</p></div>`;
     summary.innerHTML = '';
     return;
   }
+
   el.innerHTML = CART.map(c => `
     <div class="cart-item">
       <img src="${c.image}" alt="${c.title}"
@@ -448,15 +458,15 @@ function renderCartItems() {
         <div class="cart-item-price">₹${c.price.toLocaleString('en-IN')}</div>
       </div>
       <div class="cart-qty-wrap">
-        <button onclick="updateCartQty('${c.id}',-1)">−</button>
+        <button onclick="updateCartQty('${c.id}', -1)">−</button>
         <span>${c.qty}</span>
-        <button onclick="updateCartQty('${c.id}',1)">+</button>
+        <button onclick="updateCartQty('${c.id}', 1)">+</button>
       </div>
       <button class="cart-item-remove" onclick="removeFromCart('${c.id}')">✕</button>
     </div>`).join('');
 
-  const total = CART.reduce((s,c) => s + c.price * c.qty, 0);
-  const items = CART.reduce((s,c) => s + c.qty, 0);
+  const total = CART.reduce((s, c) => s + c.price * c.qty, 0);
+  const items = CART.reduce((s, c) => s + c.qty, 0);
   summary.innerHTML = `
     <span>${items} item${items !== 1 ? 's' : ''}</span>
     <span>Total: <strong>₹${total.toLocaleString('en-IN')}</strong></span>`;
@@ -465,7 +475,8 @@ function renderCartItems() {
 function updateCartQty(id, delta) {
   const item = CART.find(c => c.id === id);
   if (!item) return;
-  item.qty = Math.max(0, item.qty + delta);
+  const MAX_QTY = 10;
+  item.qty = Math.max(0, Math.min(MAX_QTY, item.qty + delta));
   if (item.qty === 0) CART = CART.filter(c => c.id !== id);
   saveCart();
   renderCartItems();
@@ -479,7 +490,7 @@ function removeFromCart(id) {
 
 function checkout() {
   if (!CART.length) { showToast('Your cart is empty!', 'warning'); return; }
-  const total = CART.reduce((s,c) => s + c.price * c.qty, 0);
+  const total = CART.reduce((s, c) => s + c.price * c.qty, 0);
   CART = [];
   saveCart();
   toggleCart();
@@ -496,11 +507,11 @@ function renderPagination() {
 
   let html = '';
   if (currentPage > 1)
-    html += `<button onclick="goPage(${currentPage-1})">‹ Prev</button>`;
+    html += `<button onclick="goPage(${currentPage - 1})">‹ Prev</button>`;
   for (let i = 1; i <= pages; i++)
-    html += `<button class="${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
   if (currentPage < pages)
-    html += `<button onclick="goPage(${currentPage+1})">Next ›</button>`;
+    html += `<button onclick="goPage(${currentPage + 1})">Next ›</button>`;
   el.innerHTML = html;
 }
 
